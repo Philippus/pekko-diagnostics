@@ -20,12 +20,8 @@ inThisBuild(
       "Contributors",
       "https://github.com/pjfanning",
       url("https://github.com/pjfanning/pekko-diagnostics/graphs/contributors")),
-    licenses := {
-      val tagOrBranch =
-        if (version.value.endsWith("SNAPSHOT")) "main"
-        else "v" + version.value
-      Seq(("Apache-2.0", url(s"https://raw.githubusercontent.com/pjfanning/pekko-diagnostics/${tagOrBranch}/LICENSE")))
-    },
+    licenses := Seq(
+      ("Apache-2.0", url("https://github.com/pjfanning/pekko-diagnostics/blob/main/LICENCE"))),
     description := "Pekko diagnostics tools and utilities",
     // add snapshot repo when Pekko version overriden
     resolvers ++=
