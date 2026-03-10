@@ -1,3 +1,5 @@
+[![Maven Central](https://maven-badges.sml.io/sonatype-central/com.github.pjfanning/pekko-diagnostics_2.13/badge.svg)](https://mvnrepository.com/artifact/com.github.pjfanning/pekko-diagnostics_2.13)
+
 # Pekko Diagnostics
 
 Pekko Diagnostics is a suite of useful components that complement Pekko.
