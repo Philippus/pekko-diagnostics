@@ -365,7 +365,7 @@ class ConfigChecker(system: ExtendedActorSystem, config: Config, reference: Conf
 
               pathList.removeLast()
 
-            case _ =>
+            case null =>
               // in case there would be something else
               ()
           }
@@ -475,7 +475,7 @@ class ConfigChecker(system: ExtendedActorSystem, config: Config, reference: Conf
                   Nil)
               }
               pathList.removeLast()
-            case _ =>
+            case null =>
               // in case there would be something else
               ()
           }
