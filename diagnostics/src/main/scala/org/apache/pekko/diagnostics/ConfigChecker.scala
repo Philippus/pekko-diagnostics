@@ -13,7 +13,7 @@
 
 package org.apache.pekko.diagnostics
 
-import java.util._
+import java.util.Locale
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 import scala.collection.JavaConverters._
@@ -402,7 +402,7 @@ class ConfigChecker(system: ExtendedActorSystem, config: Config, reference: Conf
     reference.hasPath("pekko.persistence.r2dbc.journal")
   }
 
-  private def checkTypoInR2dbcConnectionFactorySection(pathList: util.LinkedList[String]): Boolean = {
+  private def checkTypoInR2dbcConnectionFactorySection(pathList: java.util.LinkedList[String]): Boolean = {
     val i = pathList.indexOf("connection-factory")
     val dialectPath = ConfigUtil.joinPath(pathList.subList(0, i + 1)) + ".dialect"
     if (config.hasPath(dialectPath)) {
