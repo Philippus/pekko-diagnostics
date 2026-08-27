@@ -13,7 +13,7 @@
 
 package org.apache.pekko.diagnostics
 
-import java.util.Locale
+import java.util._
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
 import scala.collection.JavaConverters._
