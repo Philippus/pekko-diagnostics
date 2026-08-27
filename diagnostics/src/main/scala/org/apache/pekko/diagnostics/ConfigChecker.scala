@@ -14,6 +14,7 @@
 package org.apache.pekko.diagnostics
 
 import java.net.InetAddress
+import java.util
 import java.util.Locale
 import java.util.concurrent.TimeUnit.MILLISECONDS
 
@@ -320,6 +321,8 @@ class ConfigChecker(system: ExtendedActorSystem, config: Config, reference: Conf
         pathList.size > 4 && pathList.asScala.startsWith(Seq("pekko", "actor", "deployment"))
       def inGrpcClientSection: Boolean =
         pathList.size > 4 && pathList.asScala.startsWith(Seq("pekko", "grpc", "client"))
+      def inR2dbcConnectionFactorySection: Boolean =
+        pathList.contains("connection-factory")
 
       def checkConfigObject(obj: ConfigObject): Unit = {
         val iter = obj.entrySet().iterator()
@@ -347,6 +350,8 @@ class ConfigChecker(system: ExtendedActorSystem, config: Config, reference: Conf
                     // For checking typos inside a `pekko.grpc.client."FooService"` section remove those 4 path elements
                     // and compare with the fallback deployment config.
                     !grpcClientReference.hasPathOrNull(ConfigUtil.joinPath(pathList.subList(4, pathList.size)))
+                  else if (isR2dbcConfigAvailable && inR2dbcConnectionFactorySection)
+                    checkTypoInR2dbcConnectionFactorySection(pathList)
                   else
                     !reference.hasPathOrNull(p)
                 if (isTypo) {
@@ -392,6 +397,28 @@ class ConfigChecker(system: ExtendedActorSystem, config: Config, reference: Conf
 
       w.result()
     }
+  }
+
+  private lazy val isR2dbcConfigAvailable: Boolean = {
+    // check existence of a property from reference.conf that will unlikely be defined elsewhere
+    reference.hasPath("pekko.persistence.r2dbc.journal")
+  }
+
+  private def checkTypoInR2dbcConnectionFactorySection(pathList: util.LinkedList[String]): Boolean = {
+    val i = pathList.indexOf("connection-factory")
+    val dialectPath = ConfigUtil.joinPath(pathList.subList(0, i + 1)) + ".dialect"
+    if (config.hasPath(dialectPath)) {
+      val dialect = config.getString(dialectPath)
+      val dialectReferencePath = s"pekko.persistence.r2dbc.$dialect"
+      if (reference.hasPath(dialectReferencePath)) {
+        // For checking typos inside a `connection-factory"` section remove preceding path elements
+        // and compare with the default dialect config.
+        val dialectReference = reference.getConfig(dialectReferencePath)
+        !dialectReference.hasPathOrNull(ConfigUtil.joinPath(pathList.subList(i + 1, pathList.size)))
+      } else // wrong dialect, but that is not a typo, check as ordinary property
+        !reference.hasPathOrNull(ConfigUtil.joinPath(pathList))
+    } else // no dialect, check as ordinary property
+      !reference.hasPathOrNull(ConfigUtil.joinPath(pathList))
   }
 
   /**
